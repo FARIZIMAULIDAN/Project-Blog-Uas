@@ -7,28 +7,28 @@ const connection = require('../../config/db');
 const secretKey = 'kunciRahasiaYangSama';
 
 router.post('/register', [
-    body('name').notEmpty().withMessage('Isi semua bidang'),
-    body('jenis_kelamin').notEmpty().withMessage('Isi semua bidang'),
-    body('alamat').notEmpty().withMessage('Isi semua bidang'),
-    body('tanggal_lahir').notEmpty().withMessage('Isi semua bidang'),
-    body('email').notEmpty().withMessage('Isi semua bidang'),
-    body('passwd').notEmpty().withMessage('Isi semua bidang'), 
+    body('nama').notEmpty().withMessage('Isi nama'),
+    body('jenis_kelamin').notEmpty().withMessage('Isi jenis kelamin'),
+    body('alamat').notEmpty().withMessage('Isi alamat'),
+    body('tanggal_lahir').notEmpty().withMessage('Isi tanggal lahir'),
+    body('email').notEmpty().withMessage('Isi email'),
+    body('password').notEmpty().withMessage('Isi password'), 
   ], (req, res) => {
     const errors = validationResult(req); 
     if (!errors.isEmpty()) {
       return res.status(400).json({ error: errors.array() }); 
     }
-    const { username, password } = req.body;
+    const { name, password } = req.body;
     const checkUserQuery = 'SELECT * FROM user WHERE email = ?';
-    connection.query(checkUserQuery, [username], (err, results) => {
+    connection.query(checkUserQuery, [name], (err, results) => {
       if (err) {
         return res.status(500).json({ error: 'Server Error' });
       }
       if (results.length > 0) {
         return res.status(409).json({ error: 'Pengguna sudah terdaftar' });
       }
-      const insertUserQuery = 'INSERT INTO user (name,jenis_kelamin,alamat,tanggal_lahir,email,passwd) VALUES (?, ?)';
-      connection.query(insertUserQuery, [name,jenis_kelamin,alamat,tanggal_lahir,email,password], (err, results) => {
+      const insertUserQuery = 'INSERT INTO user (nama,jenis_kelamin,alamat,tanggal_lahir,email,password) VALUES (?, ?)';
+      connection.query(insertUserQuery, [nama,jenis_kelamin,alamat,tanggal_lahir,email,password], (err, results) => {
         if (err) {
           return res.status(500).json({ error: 'Server Error' });
         }

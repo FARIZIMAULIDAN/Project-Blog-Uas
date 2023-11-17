@@ -9,9 +9,13 @@ app.use('/static',express.static(path.join(__dirname,'public/')))
 
 const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended:false }))
+app.use(bodyParser.json())
 
 const categoriesRoutes = require('./routes/categories.js')
 app.use('/api/categories', categoriesRoutes)
+
+const users = require('./routes/auth/auth.js')
+app.use('/api/auth/user', users)
 
 const contactRoutes = require('./routes/contact')
 app.use('/api/contact', contactRoutes)
@@ -31,8 +35,6 @@ app.use('/api/post', postRoutes)
 const userRoutes = require('./routes/user')
 app.use('/api/user', userRoutes)
 
-const auth = require('./routes/auth/auth')
-app.use('/api/auth',auth)
 app.listen(port,() => {
     console.log(`http://localhost:${port}`)
 })
