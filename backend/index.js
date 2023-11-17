@@ -14,7 +14,7 @@ app.use(bodyParser.json())
 const categoriesRoutes = require('./routes/categories.js')
 app.use('/api/categories', categoriesRoutes)
 
-const users = require('./routes/auth/auth.js')
+const users = require('./routes/auth/auth')
 app.use('/api/auth/user', users)
 
 const contactRoutes = require('./routes/contact')

@@ -42,10 +42,10 @@ function Register(){
                         <input className="w-full h-8 p-4 rounded-xl border border-black" placeholder="Nama" type="text" value={nama} onChange={(e) => setNama(e.target.value)} />
                     </div>
                     <div className="mb-5">
-                        <select name="jenis_kelamin" id="jenis_kelamin"value={jenis_kelamin} onChange={(e) => setJeniskelamin(e.target.value)} className="w-full h-8 p-4 rounded-xl border border-black text-black">
-                            <option>Male</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
+                        <select value={jenis_kelamin} onChange={(e) => setJeniskelamin(e.target.value)} className="w-full h-9 px-4 rounded-xl border border-black text-black">
+                            <option value="">Jenis kelamin anda</option>
+                            <option  value={"male"}>Male</option>
+                            <option  value={"female"}>Female</option>
                         </select>
                     </div>
                     <div className="mb-5">

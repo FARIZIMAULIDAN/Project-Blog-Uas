@@ -18,24 +18,24 @@ router.post('/register', [
     if (!errors.isEmpty()) {
       return res.status(400).json({ error: errors.array() }); 
     }
-    const { name, password } = req.body;
+    const { nama, jenis_kelamin, alamat, tanggal_lahir, email, password } = req.body;
     const checkUserQuery = 'SELECT * FROM user WHERE email = ?';
-    connection.query(checkUserQuery, [name], (err, results) => {
+    connection.query(checkUserQuery, [nama], (err, result) => {
       if (err) {
-        return res.status(500).json({ error: 'Server Error' });
+        return res.status(500).json({ error: 'Server Error', msg:err });
       }
-      if (results.length > 0) {
+      if (result.length > 0) {
         return res.status(409).json({ error: 'Pengguna sudah terdaftar' });
       }
-      const insertUserQuery = 'INSERT INTO user (nama,jenis_kelamin,alamat,tanggal_lahir,email,password) VALUES (?, ?)';
-      connection.query(insertUserQuery, [nama,jenis_kelamin,alamat,tanggal_lahir,email,password], (err, results) => {
+      const insertUserQuery = 'INSERT INTO user (nama, jenis_kelamin, alamat, tanggal_lahir, email, password) VALUES (?,?,?,?,?,?)';
+      connection.query(insertUserQuery, [nama, jenis_kelamin, alamat, tanggal_lahir, email, password], (err, result) => {
         if (err) {
-          return res.status(500).json({ error: 'Server Error' });
+          return res.status(500).json({ error: 'Server Error', msg: err });
         }
-        const payload = { userId: results.insertId, username };
+        const payload = { userId:result.insertId, nama };
         const token = jwt.sign(payload, secretKey);
-        const updateTokenQuery = 'UPDATE users SET token = ? WHERE id = ?';
-        connection.query(updateTokenQuery, [token, results.insertId], (err, results) => {
+        const updateTokenQuery = 'UPDATE user SET token = ? WHERE id = ?';
+        connection.query(updateTokenQuery, [token, result.insertId], (err, result) => {
           if (err) {
             return res.status(500).json({ error: 'Server Error' });
           }
