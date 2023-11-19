@@ -20,7 +20,7 @@ router.post('/register', [
     }
     const { nama, jenis_kelamin, alamat, tanggal_lahir, email, password } = req.body;
     const checkUserQuery = 'SELECT * FROM user WHERE email = ?';
-    connection.query(checkUserQuery, [nama], (err, result) => {
+    connection.query(checkUserQuery, [email], (err, result) => {
       if (err) {
         return res.status(500).json({ error: 'Server Error', msg:err });
       }
@@ -46,7 +46,7 @@ router.post('/register', [
   });
 
 router.post('/login', (req, res) => {
-    const { email, passwd } = req.body;
+    const { email, password } = req.body;
   
     connection.query('SELECT * FROM user WHERE email = ?', [email], (error, results) => {
       if (error) {
@@ -56,7 +56,7 @@ router.post('/login', (req, res) => {
         return res.status(401).json({ error: 'Gagal masuk' });
       }
       const user = results[0];
-      if (user.passwd !== passwd) {
+      if (user.password !== password) {
         return res.status(401).json({ error: 'Kata sandi salah' });
       }
       if (user.token) {
@@ -65,7 +65,7 @@ router.post('/login', (req, res) => {
       } else {
         const payload = { userId: user.id, username };
         const token = jwt.sign(payload, secretKey);
-        const updateTokenQuery = 'UPDATE users SET token = ? WHERE id = ?';
+        const updateTokenQuery = 'UPDATE user SET token = ? WHERE id = ?';
         connection.query(updateTokenQuery, [token, user.id], (err, updateResult) => {
           if (err) {
             return res.status(500).json({ error: 'Server Error' });

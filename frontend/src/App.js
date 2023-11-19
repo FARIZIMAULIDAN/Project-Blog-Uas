@@ -1,7 +1,7 @@
 import Routing from "./template/Routing";
 function App() {
   return (
-    <div className="w-full h-max">
+    <div className="">
       <Routing />
     </div>
   );

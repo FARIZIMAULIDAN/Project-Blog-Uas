@@ -2,9 +2,27 @@ import React, {useState, useEffect} from  "react";
 import axios from "axios";
 
 function HomePage(){
+    const token = localStorage.getItem('token');
+    const isLoggedIn = !!token;
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        console.log('berhasil logout');
+        window.location.reload();
+        alert('Logout successful');
+    };
     return(
-        <div className="w-full h-max">
-            <div className="mt-24 w-3/4 md:w-4/5 lg:w-1/3 h-max p-3 mx-auto shadow shadow-gray-300 mb-3 rounded-md bg-white">
+        <div className="">
+            <div className="w-full h-20 shadow">
+                <div className="absolute left-10 top-0">
+                    <img src="images/b7.png" height={20} width={90}/>
+                </div>
+                <div className="flex absolute right-12 top-6 gap-10">
+                    <a className="font-semibold text-2xl font-sans" href="/home">Home</a>
+                    <button className="font-semibold text-2xl font-sans" onClick={handleLogout}>Logout</button>
+                    
+                </div>
+            </div>
+            <div className="mt-8 w-3/4 md:w-4/5 lg:w-1/3 h-max p-3 mx-auto shadow shadow-gray-300 mb-3 rounded-md bg-white">
             <div className="flex mt-2">
                 <div className="ml-3 w-10 h-10 rounded-full shadow">
                     <img src="images/user.png" className="rounded-full" width={40}/>

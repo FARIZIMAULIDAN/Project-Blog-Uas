@@ -22,11 +22,13 @@ function Register(){
             password: password,
           });
           console.log('Pendaftaran berhasil:', response.data);
-          navigate('/Login');
+          navigate('/');
           window.location.reload();
+          alert('Register Successful');
         } catch (error) {
           console.error('Gagal mendaftar:', error);
           console.log(error);
+          alert('User or email is already registered');
         }
       };
 
@@ -39,7 +41,7 @@ function Register(){
                 <span className="w-full h-[1.75px] bg-black block" />
                 <div className="w-full mt-10">
                     <div className="mb-5">
-                        <input className="w-full h-8 p-4 rounded-xl border border-black" placeholder="Nama" type="text" value={nama} onChange={(e) => setNama(e.target.value)} />
+                        <input className="w-full h-8 p-4 rounded-xl border border-black" placeholder="Name" type="text" value={nama} onChange={(e) => setNama(e.target.value)} />
                     </div>
                     <div className="mb-5">
                         <select value={jenis_kelamin} onChange={(e) => setJeniskelamin(e.target.value)} className="w-full h-9 px-4 rounded-xl border border-black text-black">
@@ -65,7 +67,7 @@ function Register(){
                     </div>
                     <span className="w-full h-[1.75px] bg-black block" />
                     <div>
-                        <h1>Have account? <a className="text-blue-300 hover:text-blue-500 duration-100 ease-out" href="/Login">Click here</a> to login</h1>
+                        <h1>Have account? <a className="text-blue-300 hover:text-blue-500 duration-100 ease-out" href="/">Click here</a> to login</h1>
                     </div>
                 </div>
             </div>
