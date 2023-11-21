@@ -5,11 +5,11 @@ import Register from "../pages/Register";
 function Routing(){
     return (
         <div className="">
-                <Routes>
-                    <Route path="/" element={<Login />} />
-                    <Route path="/home" element={<HomePage />} />
-                    <Route path="/register" element={<Register />} />
-                </Routes>
+            <Routes>
+                <Route path="/" element={<Login />} />
+                <Route path="/home" element={<HomePage />} />
+                <Route path="/register" element={<Register />} />
+            </Routes>
         </div>
     );
 }

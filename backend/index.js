@@ -5,7 +5,7 @@ const cors = require('cors')
 
 app.use(cors())
 const path = require('path')
-app.use('/static',express.static(path.join(__dirname,'public/')))
+app.use('/static',express.static(path.join(__dirname,'public/images')))
 
 const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended:false }))
@@ -26,7 +26,7 @@ app.use('/api/comment', commentRoutes)
 const favoriteRoutes = require('./routes/favorite')
 app.use('/api/favorite', favoriteRoutes)
 
-const likeRoutes = require('./routes/like.js')
+const likeRoutes = require('./routes/like')
 app.use('/api/like', likeRoutes)
 
 const postRoutes = require('./routes/post')

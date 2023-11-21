@@ -6,8 +6,8 @@ const {body, validationResult} = require('express-validator')
 
 const authenticateToken = require('./auth/middleware/authenticateToken')
 
-router.get('/',authenticateToken, function(req,res){
-    connection.query('SELECT * FROM user order by id desc', function(err, rows){
+router.get('/', authenticateToken, function(req,res){
+    connection.query('SELECT * FROM user LIMIT 1', function(err, rows){
         if(err){
             return res.status(500).json({
                 status: false,
@@ -63,9 +63,9 @@ router.post('/store',authenticateToken, [
     })
 })
 
-router.get('/(:id)', function(req,res) {
-    let id= req.params.id
-    connection.query(`SELECT * FROM user where id = ${id}`, function(err,rows){
+router.get('/(:token)', authenticateToken, function(req,res) {
+    let token = req.params.token;
+    connection.query("SELECT * FROM user where token = ?", token, function(err,rows){
         if(err){
             return res.status(500).json({
                 status: false,
@@ -88,6 +88,34 @@ router.get('/(:id)', function(req,res) {
         }
     })
 })
+
+router.get('/:token', (req, res) => {
+    const token = req.params.token;
+  
+    connection.query('SELECT * FROM user WHERE token = ?', [token], (error, results) => {
+      if (error) {
+        return res.status(500).json({ error: 'Server Error' });
+      }
+      if (results.length === 0) {
+        return res.status(401).json({ error: 'Gagal masuk' });
+      }
+    //   const user = results[0];
+    //   if (user.token) {
+    //     const token = user.token;
+    //     res.json({ token });
+    //   } else {
+    //     const payload = { userId: user.id, email };
+    //     const token = jwt.sign(payload, secretKey);
+    //     const updateTokenQuery = 'UPDATE user SET token = ? WHERE id = ?';
+    //     connection.query(updateTokenQuery, [token, user.id], (err, updateResult) => {
+    //       if (err) {
+    //         return res.status(500).json({ error: 'Server Error' });
+    //       }
+    //       res.json({ token });
+    //     });
+    //   }
+    });
+  });
 
 router.patch('/update/:id',authenticateToken,[
     body('name').notEmpty(),

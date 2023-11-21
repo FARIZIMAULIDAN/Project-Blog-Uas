@@ -16,19 +16,21 @@ const storage = multer.diskStorage({
     }   
 })
 
-const fileFilter = (req,file,cb) =>{
-    if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg'){
-        cb(null, true);
-    }else{
-        cb(new Error('jenis file tidak diizinkan'),false);
-    }
-}
+const upload = multer({storage: storage})
+// const fileFilter = (req,file,cb) =>{
+//     if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg'){
+//         cb(null, true);
+//     }else{
+//         cb(new Error('jenis file tidak diizinkan'),false);
+//     }
+// }
 
-const upload = multer({storage:storage,fileFilter:fileFilter})
+// const upload = multer({storage:storage,fileFilter:fileFilter})
+
 const authenticateToken = require('./auth/middleware/authenticateToken')
 
 router.get('/',authenticateToken, function(req,res){
-    connection.query('SELECT * FROM post order by id desc', function(err, rows){
+    connection.query('SELECT user.nama, post.body, post.photos FROM post JOIN user ON post.user_id = user.id order by post.id desc', function(err, rows){
         if(err){
             return res.status(500).json({
                 status: false,
@@ -45,15 +47,7 @@ router.get('/',authenticateToken, function(req,res){
     })
 })
 
-router.post('/store',upload.single("photos"),[
-    body('tittle').notEmpty(),
-    body('user_id').notEmpty(),
-    body('body').notEmpty(),
-    body('slug').notEmpty(),
-    body('photos').notEmpty(),
-    body('category_id').notEmpty(),
-    body('excerpt').notEmpty(),
-], (req, res) => {
+router.post('/store', authenticateToken, upload.single("photos"), (req, res) => {
     const error = validationResult(req)
     if(!error.isEmpty()){
         return res.status(422).json({
@@ -61,13 +55,9 @@ router.post('/store',upload.single("photos"),[
         })
     }
     let Data = {
-        tittle: req.body.tittle,
         user_id: req.body.user_id,
         body: req.body.body,
-        slug: req.body.slug,
         photos: req.file.filename,
-        category_id: req.body.category_id,
-        excerpt: req.body.excerpt,
     }
     connection.query('insert into post set ? ', Data, function(err, rows){
         if(err){
@@ -88,7 +78,7 @@ router.post('/store',upload.single("photos"),[
 
 router.get('/(:id)', function(req,res) {
     let id= req.params.id
-    connection.query(`select * from post where id = ${id}`, function(err,rows){
+    connection.query("select * from post where id = ?", id, function(err,rows){
         if(err){
             return res.status(500).json({
                 status: false,
@@ -129,7 +119,7 @@ router.patch('/update/:id',authenticateToken,upload.single("photos"),[
     }
     let id = req.params.id
     let photos = req.file ? req.file.filename:null;
-    connection.query(`select *from post where id = ${id}`,function(err,rows){
+    connection.query(`select * from post where id = ${id}`,function(err,rows){
         if(err){
             return res.status(500).json({
                 status:false,
@@ -176,8 +166,7 @@ router.patch('/update/:id',authenticateToken,upload.single("photos"),[
 
 router.delete('/delete/(:id)',authenticateToken, function(req, res){
     let id = req.params.id
-
-    connection.query(`select *from post where id = ${id}`,function(err,rows){
+    connection.query(`select * from post where id = ${id}`,function(err,rows){
         if(err){
             return res.status(500).json({
                 status:false,

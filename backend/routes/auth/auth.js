@@ -11,8 +11,8 @@ router.post('/register', [
     body('jenis_kelamin').notEmpty().withMessage('Isi jenis kelamin'),
     body('alamat').notEmpty().withMessage('Isi alamat'),
     body('tanggal_lahir').notEmpty().withMessage('Isi tanggal lahir'),
-    body('email').notEmpty().withMessage('Isi email'),
-    body('password').notEmpty().withMessage('Isi password'), 
+    body('email').notEmpty().withMessage('Isi email').isEmail(),
+    body('password').notEmpty().withMessage('Isi password').isLength({ min:5 }), 
   ], (req, res) => {
     const errors = validationResult(req); 
     if (!errors.isEmpty()) {
@@ -63,7 +63,7 @@ router.post('/login', (req, res) => {
         const token = user.token;
         res.json({ token });
       } else {
-        const payload = { userId: user.id, username };
+        const payload = { userId: user.id, email };
         const token = jwt.sign(payload, secretKey);
         const updateTokenQuery = 'UPDATE user SET token = ? WHERE id = ?';
         connection.query(updateTokenQuery, [token, user.id], (err, updateResult) => {
