@@ -10,7 +10,6 @@ function Register(){
     const [tanggal_lahir, setTanggallahir] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
     const handleRegister = async () => {
         try {
           const response = await axios.post('http://localhost:3000/api/auth/user/register', {

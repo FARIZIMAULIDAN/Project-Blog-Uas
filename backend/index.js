@@ -7,6 +7,7 @@ app.use(cors())
 const path = require('path')
 app.use('/static',express.static(path.join(__dirname,'public/images')))
 
+
 const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({ extended:false }))
 app.use(bodyParser.json())
