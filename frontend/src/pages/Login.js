@@ -30,7 +30,7 @@ function Login(){
   };
   
     return(
-        <div className="w-full h-screen flex font-sans bg-zinc-400">
+        <div className="w-full h-screen flex font-sans bg-gray-200">
             <div className="mt-36 w-9/12 md:w-3/4 lg:w-1/4 h-max p-5 mx-auto shadow shadow-slate-600 rounded-lg bg-white">
                 <div className="mb-2">
                     <a className="text-xl font-semibold">Login</a>

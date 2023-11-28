@@ -6,10 +6,11 @@ const cors = require('cors')
 app.use(cors())
 const path = require('path')
 app.use('/static',express.static(path.join(__dirname,'public/images')))
+app.use('/userPhotos',express.static(path.join(__dirname,'public/user')))
 
 
 const bodyParser = require('body-parser')
-app.use(bodyParser.urlencoded({ extended:false }))
+app.use(bodyParser.urlencoded({ extended:true }))
 app.use(bodyParser.json())
 
 const categoriesRoutes = require('./routes/categories.js')

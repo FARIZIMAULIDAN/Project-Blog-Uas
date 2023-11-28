@@ -57,7 +57,7 @@ router.post('/store',authenticateToken,[
 
 router.get('/(:id)', function(req,res) {
     let id= req.params.id
-    connection.query(`select * from love where id = ${id}`, function(err,rows){
+    connection.query(`select * from love where user_id = ${id}`, function(err,rows){
         if(err){
             return res.status(500).json({
                 status: false,
@@ -75,7 +75,7 @@ router.get('/(:id)', function(req,res) {
             return res.status(200).json({
                 status: true,
                 message:'jumlah Like :',
-                data: rows[0]
+                data: rows
             })
         }
     })
@@ -115,7 +115,7 @@ router.patch('/update/:id',authenticateToken,[
 
 router.delete('/delete/(:id)',authenticateToken, function(req, res){
     let id = req.params.id
-    connection.query(`delete from love where id = ${id}`, function(err, rows){
+    connection.query(`delete from love where post_id = ${id}`, function(err, rows){
         if(err){
             return res.status(500).json({
                 status: false,

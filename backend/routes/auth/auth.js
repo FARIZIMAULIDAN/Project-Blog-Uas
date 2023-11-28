@@ -4,7 +4,9 @@ const {body, validationResult} = require('express-validator');
 const router = express.Router();
 const connection = require('../../config/db');
 const multer = require('multer')
-const path =  require('path')
+const path =  require('path');
+const authenticateToken = require('./middleware/authenticateToken');
+const { verify } = require('crypto');
 
 const secretKey = 'kunciRahasiaYangSama';
 
@@ -19,7 +21,7 @@ const storage = multer.diskStorage({
 })
 const upload = multer({storage:storage})
 
-router.post('/register',upload.single("photos"),[
+router.post('/register',upload.single("photo"),[
     body('nama').notEmpty().withMessage('Isi nama'),
     body('jenis_kelamin').notEmpty().withMessage('Isi jenis kelamin'),
     body('alamat').notEmpty().withMessage('Isi alamat'),
@@ -31,8 +33,17 @@ router.post('/register',upload.single("photos"),[
     if (!errors.isEmpty()) {
       return res.status(400).json({ error: errors.array() }); 
     }
-    const { nama, jenis_kelamin, alamat, tanggal_lahir, email, password} = req.body;
-    const photos = req.file.filename;
+    const { nama, email } = req.body;
+    // let photo = req.file.filename;
+    let Data = {
+      nama: req.body.nama,
+      jenis_kelamin:req.body.jenis_kelamin,
+      alamat:req.body.alamat,
+      tanggal_lahir: req.body.tanggal_lahir,
+      photo: req.file.filename,
+      email: req.body.email,
+      password: req.body.password,
+    }
     const checkUserQuery = 'SELECT * FROM user WHERE email = ?';
     connection.query(checkUserQuery, [email], (err, result) => {
       if (err) {
@@ -41,8 +52,8 @@ router.post('/register',upload.single("photos"),[
       if (result.length > 0) {
         return res.status(409).json({ error: 'Pengguna sudah terdaftar' });
       }
-      const insertUserQuery = 'INSERT INTO user (nama, jenis_kelamin, alamat, tanggal_lahir, email, password, photos) VALUES (?,?,?,?,?,?,?)';
-      connection.query(insertUserQuery, [nama, jenis_kelamin, alamat, tanggal_lahir, email, password, photos], (err, result) => {
+      const insertUserQuery = 'INSERT INTO user set ?';
+      connection.query(insertUserQuery, Data, (err, result) => {
         if (err) {
           return res.status(500).json({ error: 'Server Error', msg: err });
         }
@@ -74,20 +85,85 @@ router.post('/login', (req, res) => {
         return res.status(401).json({ error: 'Kata sandi salah' });
       }
       if (user.token) {
+        const statusData = { status: '1', user_id: user.id };
+        connection.query('INSERT INTO status SET ?', statusData, (err, result) => {
+        if (err) {
+          return res.status(500).json({ error: 'Server Error', msg: err });
+        }
+      });
         const token = user.token;
         res.json({ token });
       } else {
-        const payload = { userId: user.id, email };
-        const token = jwt.sign(payload, secretKey);
-        const updateTokenQuery = 'UPDATE user SET token = ? WHERE id = ?';
-        connection.query(updateTokenQuery, [token, user.id], (err, updateResult) => {
-          if (err) {
-            return res.status(500).json({ error: 'Server Error' });
-          }
-          res.json({ token });
-        });
+          const payload = { userId: user.id, email };
+          const token = jwt.sign(payload, secretKey);
+          const updateTokenQuery = 'UPDATE user SET token = ? WHERE id = ?';
+          connection.query(updateTokenQuery, [token, user.id], (err, updateResult) => {
+            if (err) {
+              return res.status(500).json({ error: 'Server Error' });
+            }
+            res.json({ Login:true, token, updateResult });
+          })
       }
     });
   });
+
+  router.get('/(:token)', authenticateToken, function(req, res) {
+    const token = req.params.token;
+    // const decoded = jwt.decode(token, secretKey);
+    
+    // if (!decoded) {
+    //   return res.status(401).json({ error: 'Not authenticated' });
+    // }
+    
+    // const id = decoded.userId;
+    const getUserQuery = 'SELECT * FROM user WHERE token = ?';
+
+    connection.query(getUserQuery, [token], (err, results) => {
+        if (err) {
+          return res.status(500).json({ 
+            error: 'Server Error',
+            msg: err
+          });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ 
+              error: 'User not found',
+              message: err 
+            });
+        } else {
+          return res.status(200).json({
+            status: true,
+            message:'Data User :',
+            data: results[0]
+        })
+        }
+    });
+});
+
+  router.get('/id/(:id)', function(req, res) {
+    const id = req.params.id;
+    const getUserQuery = 'SELECT nama, photo, id FROM user WHERE id = ?';
+
+    connection.query(getUserQuery, [id], (err, results) => {
+        if (err) {
+          return res.status(500).json({ 
+            error: 'Server Error',
+            msg: err
+          });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ 
+              error: 'User not found',
+              message: err 
+            });
+        } else {
+          return res.status(200).json({
+            status: true,
+            message:'Data User :',
+            data: results[0]
+        })
+        }
+    });
+});
 
   module.exports = router;

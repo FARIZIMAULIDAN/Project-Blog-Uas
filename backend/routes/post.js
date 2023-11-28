@@ -30,7 +30,7 @@ const upload = multer({storage: storage})
 const authenticateToken = require('./auth/middleware/authenticateToken')
 
 router.get('/',authenticateToken, function(req,res){
-    connection.query('SELECT user.nama, post.body, post.photos FROM post JOIN user ON post.user_id = user.id order by post.id desc', function(err, rows){
+    connection.query('SELECT post.id, user.nama, post.body, post.photos, user.photo, user_id FROM post JOIN user ON post.user_id = user.id order by post.id desc', function(err, rows){
         if(err){
             return res.status(500).json({
                 status: false,
@@ -47,38 +47,61 @@ router.get('/',authenticateToken, function(req,res){
     })
 })
 
-router.post('/store', authenticateToken, upload.single("photos"), (req, res) => {
-    const error = validationResult(req)
-    if(!error.isEmpty()){
-        return res.status(422).json({
-            error: error.array()
-        })
-    }
-    let Data = {
-        user_id: req.body.user_id,
-        body: req.body.body,
-        photos: req.file.filename,
-    }
-    connection.query('insert into post set ? ', Data, function(err, rows){
+router.get('/user_id',authenticateToken, function(req,res){
+    connection.query('SELECT user.nama, post.body, post.photos, user.photo, user_id FROM post JOIN user ON post.user_id = user.id order by post.user_id desc', function(err, rows){
         if(err){
             return res.status(500).json({
                 status: false,
                 message: 'server failed',
-                error : err
+                error: err
             })
         } else {
-            return res.status(201).json({
+            return res.status(200).json({
                 status: true,
-                message:'Post Create',
-                data: rows[0]
+                message:'Data posts :',
+                data: rows
             })
         }
     })
 })
 
+router.post('/store', upload.single("photos"), (req, res) => {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+        return res.status(422).json({
+            error: error.array()
+        });
+    }
+
+    let data = {
+        user_id: req.body.user_id,
+        body: req.body.body,
+    };
+
+    if (req.file) {
+        data.photos = req.file.filename;
+    }
+
+    connection.query('INSERT INTO post SET ?', data, function (err, rows) {
+        if (err) {
+            return res.status(500).json({
+                status: false,
+                message: 'server failed',
+                error: err
+            });
+        } else {
+            return res.status(201).json({
+                status: true,
+                message: 'Post Created',
+                data: rows[0]
+            });
+        }
+    });
+});
+
 router.get('/(:id)', function(req,res) {
     let id= req.params.id
-    connection.query("select * from post where id = ?", id, function(err,rows){
+    connection.query(`SELECT user.nama, post.body, post.photos, user.photo, user_id FROM post JOIN user ON post.user_id = user.id where user_id = ? ORDER BY post.id desc `, id, function(err,rows){
         if(err){
             return res.status(500).json({
                 status: false,
@@ -96,7 +119,7 @@ router.get('/(:id)', function(req,res) {
             return res.status(200).json({
                 status: true,
                 message:'data post :',
-                data: rows[0]
+                data: rows
             })
         }
     })
